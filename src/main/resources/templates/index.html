@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Web Content Extractor</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <style>
+
+        /* ---------- GENERAL ---------- */
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #e9efff);
+            min-height: 100vh;
+            color: #212529;
+        }
+
+        /* ---------- NAVBAR ---------- */
+
+        .navbar {
+            background: linear-gradient(135deg, #0d6efd, #4f46e5) !important;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .navbar-brand img {
+            border-radius: 8px;
+            object-fit: contain;
+            background: white;
+            padding: 3px;
+        }
+
+        /* ---------- MAIN CONTAINER ---------- */
+
+        .content-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        /* ---------- TITLE ---------- */
+
+        .main-title {
+            font-weight: 800;
+            background: linear-gradient(90deg, #0d6efd, #6f42c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #6c757d;
+            font-size: 15px;
+        }
+
+        /* ---------- INPUT ---------- */
+
+        .url-input {
+            height: 52px;
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+            padding-left: 16px;
+            transition: all 0.25s ease;
+        }
+
+        .url-input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.12);
+        }
+
+        /* ---------- SCRAPE BUTTON ---------- */
+
+        .scrape-btn {
+            height: 52px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            background: linear-gradient(135deg, #0d6efd, #4f46e5);
+            transition: all 0.25s ease;
+        }
+
+        .scrape-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+        }
+
+        .scrape-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ---------- SECTION ---------- */
+
+        .result-section {
+            margin-top: 28px;
+            padding: 20px;
+            border-radius: 14px;
+            background: #f8f9fc;
+            border: 1px solid #e5e7eb;
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: #343a40;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .section-icon {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px;
+            background: #e7f0ff;
+            color: #0d6efd;
+            font-size: 17px;
+        }
+
+        /* ---------- IMAGE RESULTS ---------- */
+
+        #images {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .image-card {
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.25s ease;
+        }
+
+        .image-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+        }
+
+        /* ---------- LINKS ---------- */
+
+        .link-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .link-item:hover {
+            border-color: #0d6efd;
+            background: #f8fbff;
+            transform: translateX(3px);
+        }
+
+        .link-item a {
+            color: #0d6efd;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .link-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* ---------- VIDEO ---------- */
+
+        #videos {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 18px;
+        }
+
+        .video-card {
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.25s ease;
+        }
+
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .video-card video {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+        }
+
+        /* ---------- EMPTY STATE ---------- */
+
+        .empty-message {
+            text-align: center;
+            padding: 25px;
+            color: #6c757d;
+            background: white;
+            border-radius: 10px;
+            border: 1px dashed #ced4da;
+        }
+
+        /* ---------- LOADING ---------- */
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+
+        @media (max-width: 768px) {
+
+            .content-box {
+                padding: 20px;
+                border-radius: 14px;
+            }
+
+            .main-title {
+                font-size: 26px;
+            }
+
+            #images {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            #videos {
+                grid-template-columns: 1fr;
+            }
+
+            .video-card video {
+                height: auto;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+
+    <div class="container">
+
+        <a class="navbar-brand d-flex align-items-center" href="#">
+
+            <img src="/images/logo.png"
+                 width="40"
+                 height="40"
+                 class="me-2">
+
+            <span class="logo-text">
+                WebScraper
+            </span>
+
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= MAIN CONTENT ================= -->
+
+<div class="container mt-5 mb-5">
+
+    <div class="content-box">
+
+        <!-- TITLE -->
+
+        <div class="text-center mb-4">
+
+            <h2 class="main-title mb-2">
+                Web Content Extractor
+            </h2>
+
+            <p class="subtitle">
+                Extract images, links and videos from any public webpage.
+            </p>
+
+        </div>
+
+
+        <!-- URL INPUT -->
+
+        <div class="mb-3">
+
+            <input type="text"
+                   id="urlInput"
+                   class="form-control url-input"
+                   placeholder="https://example.com">
+
+        </div>
+
+
+        <!-- SCRAPE BUTTON -->
+
+        <button onclick="scrape()"
+                id="scrapeButton"
+                class="btn btn-primary scrape-btn w-100">
+
+            🔍 Scrape Website
+
+        </button>
+
+
+        <!-- LOADING -->
+
+        <div id="loading" class="loading">
+
+            <div class="spinner-border text-primary"
+                 role="status">
+            </div>
+
+            <p class="mt-2 text-muted">
+                Extracting website content...
+            </p>
+
+        </div>
+
+
+        <hr class="my-4">
+
+
+        <!-- ================= IMAGES ================= -->
+
+        <div class="result-section">
+
+            <h4 class="section-title">
+
+                <span class="section-icon">
+                    🖼️
+                </span>
+
+                Images
+
+            </h4>
+
+            <div id="images">
+
+                <div class="empty-message">
+                    Images extracted from the website will appear here.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= LINKS ================= -->
+
+        <div class="result-section">
+
+            <h4 class="section-title">
+
+                <span class="section-icon">
+                    🔗
+                </span>
+
+                Links
+
+            </h4>
+
+            <div id="links">
+
+                <div class="empty-message">
+                    Website links will appear here.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= VIDEOS ================= -->
+
+        <div class="result-section">
+
+            <h4 class="section-title">
+
+                <span class="section-icon">
+                    🎬
+                </span>
+
+                Videos
+
+            </h4>
+
+            <div id="videos">
+
+                <div class="empty-message">
+                    Videos extracted from the website will appear here.
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+    function scrape() {
+
+        let url = document.getElementById("urlInput").value.trim();
+
+        if (!url) {
+
+            alert("Please enter a website URL.");
+
+            return;
+        }
+
+
+        const loading = document.getElementById("loading");
+        const button = document.getElementById("scrapeButton");
+
+        loading.style.display = "block";
+
+        button.disabled = true;
+
+        button.innerHTML = "⏳ Scraping...";
+
+
+        fetch(`/api/scrape?url=${encodeURIComponent(url)}`)
+
+            .then(res => {
+
+                if (!res.ok) {
+                    throw new Error("Failed to scrape website.");
+                }
+
+                return res.json();
+
+            })
+
+            .then(data => {
+
+                /* ---------- IMAGES ---------- */
+
+                const images = data.images || [];
+
+                document.getElementById("images").innerHTML =
+
+                    images.length === 0
+
+                    ? `<div class="empty-message">
+                         No images found.
+                       </div>`
+
+                    : images.map(img =>
+
+                        `<div class="image-card">
+                            <img src="${img}"
+                                 alt="Extracted image"
+                                 loading="lazy"
+                                 onerror="this.parentElement.style.display='none'">
+                         </div>`
+
+                    ).join("");
+
+
+                /* ---------- LINKS ---------- */
+
+                const links = data.links || [];
+
+                document.getElementById("links").innerHTML =
+
+                    links.length === 0
+
+                    ? `<div class="empty-message">
+                         No links found.
+                       </div>`
+
+                    : links.map(link =>
+
+                        `<div class="link-item">
+                            🔗
+                            <a href="${link}"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                ${link}
+                            </a>
+                         </div>`
+
+                    ).join("");
+
+
+                /* ---------- VIDEOS ---------- */
+
+                const videos = data.videos || [];
+
+                document.getElementById("videos").innerHTML =
+
+                    videos.length === 0
+
+                    ? `<div class="empty-message">
+                         No videos found.
+                       </div>`
+
+                    : videos.map(v =>
+
+                        `<div class="video-card">
+
+                            <video src="${v}"
+                                   controls
+                                   preload="metadata">
+                            </video>
+
+                         </div>`
+
+                    ).join("");
+
+            })
+
+            .catch(error => {
+
+                console.error(error);
+
+                alert("Unable to scrape the website. Please check the URL and try again.");
+
+            })
+
+            .finally(() => {
+
+                loading.style.display = "none";
+
+                button.disabled = false;
+
+                button.innerHTML = "🔍 Scrape Website";
+
+            });
+
+    }
+
+</script>
+
+</body>
+</html>
